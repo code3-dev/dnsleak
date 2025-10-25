@@ -69,7 +69,7 @@ This repository uses GitHub Actions for continuous integration and cross-platfor
 
 ### Built Artifacts
 
-The GitHub Actions workflow builds the following binaries:
+The GitHub Actions workflow automatically builds and releases the following binaries:
 
 **Standard Platforms:**
 - `dnsleak-linux-x64` (Linux x64)

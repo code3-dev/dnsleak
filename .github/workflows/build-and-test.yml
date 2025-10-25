@@ -164,9 +164,21 @@ jobs:
         # Create a directory for all release assets
         mkdir -p release-assets
         
-        # Move all binaries to the release-assets directory
+        # Move all binaries from artifact directories to the release-assets directory
         find . -name "dnsleak-*" -type f -not -path "./release-assets/*" -not -path "./.git/*" | while read file; do
           mv "$file" release-assets/
+        done
+        
+        # Also move files from the Android artifact directory
+        if [ -d "dnsleak-android-all-architectures" ]; then
+          mv dnsleak-android-all-architectures/* release-assets/ 2>/dev/null || true
+        fi
+        
+        # Move files from other platform-specific directories
+        for dir in dnsleak-linux-* dnsleak-windows-* dnsleak-macos-*; do
+          if [ -d "$dir" ]; then
+            mv "$dir"/* release-assets/ 2>/dev/null || true
+          fi
         done
         
         # List the release assets

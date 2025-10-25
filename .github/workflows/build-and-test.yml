@@ -44,10 +44,10 @@ jobs:
         target:
           # Linux
           - { os: linux, arch: amd64, name: linux-x64, binary: dnsleak-linux-x64 }
-          - { os: linux, arch: "386", name: linux-x86, binary: dnsleak-linux-x86 }
+          - { os: linux, arch: 386, name: linux-x86, binary: dnsleak-linux-x86 }
           # Windows
           - { os: windows, arch: amd64, name: windows-x64, binary: dnsleak-windows-x64.exe }
-          - { os: windows, arch: "386", name: windows-x86, binary: dnsleak-windows-x86.exe }
+          - { os: windows, arch: 386, name: windows-x86, binary: dnsleak-windows-x86.exe }
           # macOS
           - { os: darwin, arch: amd64, name: macos-x64, binary: dnsleak-macos-x64 }
           - { os: darwin, arch: arm64, name: macos-arm64, binary: dnsleak-macos-arm64 }
@@ -76,7 +76,7 @@ jobs:
         ls -la ${{ matrix.target.binary }}
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: dnsleak-${{ matrix.target.name }}
         path: ${{ matrix.target.binary }}
@@ -116,7 +116,7 @@ jobs:
         ls -la dnsleak-android-x86_64
 
     - name: Upload Android artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: dnsleak-android-all-architectures
         path: |
@@ -135,7 +135,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
 
     - name: Prepare release assets
       run: |

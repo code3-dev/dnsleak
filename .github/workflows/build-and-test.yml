@@ -8,6 +8,11 @@ on:
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
 
 jobs:
   test:
@@ -112,7 +117,8 @@ jobs:
         
         # Android ARM (ARMv7a)
         echo "Building for Termux (Android ARM/ARMv7a)"
-        CGO_ENABLED=0 GOOS=android GOARCH=arm go build -o dnsleak-android-arm .
+        # For ARMv7, we need to specify GOARM=7
+        CGO_ENABLED=0 GOOS=android GOARCH=arm GOARM=7 go build -o dnsleak-android-arm .
         ls -la dnsleak-android-arm
         
         # Android x86
@@ -139,10 +145,18 @@ jobs:
     name: Create Release
     needs: [build, build-android]
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Set tag name
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "TAG_NAME=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+        else
+          echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        fi
 
     - name: Download all artifacts
       uses: actions/download-artifact@v4
@@ -167,8 +181,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: DNS Leak Test ${{ github.ref }}
+        tag_name: ${{ env.TAG_NAME }}
+        release_name: DNS Leak Test ${{ env.TAG_NAME }}
         body: |
           ## 🚀 DNS Leak Test Release
 
@@ -203,16 +217,16 @@ jobs:
 
           | Platform | Architecture | Download |
           |----------|-------------|----------|
-          | Windows | x64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-windows-x64.exe"><img src="https://img.shields.io/badge/Windows-x64-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows x64"></a> |
-          | Windows | x86 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-windows-x86.exe"><img src="https://img.shields.io/badge/Windows-x86-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows x86"></a> |
-          | Linux | x64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-linux-x64"><img src="https://img.shields.io/badge/Linux-x64-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux x64"></a> |
-          | Linux | x86 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-linux-x86"><img src="https://img.shields.io/badge/Linux-x86-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux x86"></a> |
-          | macOS | x64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-macos-x64"><img src="https://img.shields.io/badge/macOS-x64-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS x64"></a> |
-          | macOS | ARM64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-macos-arm64"><img src="https://img.shields.io/badge/macOS-ARM64-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS ARM64"></a> |
-          | Android | ARM64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-android-arm64"><img src="https://img.shields.io/badge/Android-ARM64-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android ARM64"></a> |
-          | Android | ARMv7a | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-android-arm"><img src="https://img.shields.io/badge/Android-ARMv7a-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android ARMv7a"></a> |
-          | Android | x86 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-android-x86"><img src="https://img.shields.io/badge/Android-x86-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android x86"></a> |
-          | Android | x86_64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-android-x86_64"><img src="https://img.shields.io/badge/Android-x86__64-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android x86_64"></a> |
+          | Windows | x64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-windows-x64.exe"><img src="https://img.shields.io/badge/Windows-x64-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows x64"></a> |
+          | Windows | x86 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-windows-x86.exe"><img src="https://img.shields.io/badge/Windows-x86-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows x86"></a> |
+          | Linux | x64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-linux-x64"><img src="https://img.shields.io/badge/Linux-x64-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux x64"></a> |
+          | Linux | x86 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-linux-x86"><img src="https://img.shields.io/badge/Linux-x86-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux x86"></a> |
+          | macOS | x64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-macos-x64"><img src="https://img.shields.io/badge/macOS-x64-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS x64"></a> |
+          | macOS | ARM64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-macos-arm64"><img src="https://img.shields.io/badge/macOS-ARM64-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS ARM64"></a> |
+          | Android | ARM64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-android-arm64"><img src="https://img.shields.io/badge/Android-ARM64-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android ARM64"></a> |
+          | Android | ARMv7a | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-android-arm"><img src="https://img.shields.io/badge/Android-ARMv7a-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android ARMv7a"></a> |
+          | Android | x86 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-android-x86"><img src="https://img.shields.io/badge/Android-x86-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android x86"></a> |
+          | Android | x86_64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-android-x86_64"><img src="https://img.shields.io/badge/Android-x86__64-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android x86_64"></a> |
 
           ### 🛠️ Usage
 

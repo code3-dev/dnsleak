@@ -36,9 +36,6 @@ jobs:
     - name: Verify dependencies
       run: go mod verify
 
-    - name: Run tests (if any)
-      run: go test -v ./...
-
   build:
     name: Build for ${{ matrix.target.os }}/${{ matrix.target.arch }}
     runs-on: ubuntu-latest

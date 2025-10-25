@@ -111,22 +111,22 @@ jobs:
       run: |
         # Android ARM64 (ARMv8a)
         echo "Building for Termux (Android ARM64/ARMv8a)"
-        CGO_ENABLED=0 GOOS=android GOARCH=arm64 go build -o dnsleak-android-arm64 .
+        CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o dnsleak-android-arm64 .
         ls -la dnsleak-android-arm64
         
         # Android ARM (ARMv7a)
         echo "Building for Termux (Android ARM/ARMv7a)"
-        CGO_ENABLED=0 GOOS=android GOARCH=arm GOARM=7 go build -o dnsleak-android-arm .
+        CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -o dnsleak-android-arm .
         ls -la dnsleak-android-arm
         
         # Android x86
         echo "Building for Termux (Android x86)"
-        CGO_ENABLED=0 GOOS=android GOARCH=386 go build -o dnsleak-android-x86 .
+        CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -o dnsleak-android-x86 .
         ls -la dnsleak-android-x86
         
         # Android x86_64
         echo "Building for Termux (Android x86_64)"
-        CGO_ENABLED=0 GOOS=android GOARCH=amd64 go build -o dnsleak-android-x86_64 .
+        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dnsleak-android-x86_64 .
         ls -la dnsleak-android-x86_64
 
     - name: Upload Android artifacts

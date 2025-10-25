@@ -97,6 +97,18 @@ Simply run the executable based on your operating system:
 .\dnsleak.exe
 ```
 
+**For Android/Termux users experiencing certificate errors:**
+
+If you encounter TLS certificate verification errors on Termux, you can bypass certificate verification by setting an environment variable:
+
+```bash
+# Linux/macOS/Android(Termux)
+DNSLEAK_INSECURE=true ./dnsleak
+
+# Windows (PowerShell)
+$env:DNSLEAK_INSECURE="true"; .\dnsleak.exe
+```
+
 **Note:** You can customize the executable name during the build process by using the `-o` flag with `go build` (e.g., `go build -o my-dns-test.exe .`).
 
 The tool will:
@@ -104,6 +116,7 @@ The tool will:
 2. Perform fake DNS lookups
 3. Analyze the results
 4. Display your IP, DNS servers, and leak status
+5. Prompt for retry (r) or quit (q) after completion or error
 
 ## Architecture
 

@@ -1,10 +1,12 @@
 package api
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -16,7 +18,7 @@ var (
 	APIDomain = "bash.ws"
 
 	// Timeout for HTTP requests
-	Timeout = 10 * time.Second
+	Timeout = 30 * time.Second
 )
 
 // Client represents an API client for bash.ws
@@ -27,9 +29,22 @@ type Client struct {
 
 // NewClient creates a new API client
 func NewClient() *Client {
+	// Check if we're running in an environment with certificate issues (like Termux)
+	insecureSkipVerify := false
+	if os.Getenv("DNSLEAK_INSECURE") == "true" {
+		insecureSkipVerify = true
+	}
+
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: insecureSkipVerify,
+		},
+	}
+
 	return &Client{
 		httpClient: &http.Client{
-			Timeout: Timeout,
+			Timeout:   Timeout,
+			Transport: transport,
 		},
 		apiDomain: APIDomain,
 	}

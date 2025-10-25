@@ -116,7 +116,7 @@ jobs:
         
         # Android ARM (ARMv7a)
         echo "Building for Termux (Android ARM/ARMv7a)"
-        # For ARMv7, we need to allow external linking
+        # For ARMv7, we need to allow external linking by not setting CGO_ENABLED=0
         GOOS=android GOARCH=arm GOARM=7 go build -o dnsleak-android-arm .
         ls -la dnsleak-android-arm
         

@@ -107,18 +107,12 @@ jobs:
         go mod tidy
         go mod verify
 
-    - name: Build for Termux (All Android Architectures)
+    - name: Build for Termux (Android Architectures)
       run: |
         # Android ARM64 (ARMv8a)
         echo "Building for Termux (Android ARM64/ARMv8a)"
         CGO_ENABLED=0 GOOS=android GOARCH=arm64 go build -o dnsleak-android-arm64 .
         ls -la dnsleak-android-arm64
-        
-        # Android ARM (ARMv7a)
-        echo "Building for Termux (Android ARM/ARMv7a)"
-        # For ARMv7, we need to use the standard build flags
-        CGO_ENABLED=1 GOOS=android GOARCH=arm GOARM=7 go build -o dnsleak-android-arm .
-        ls -la dnsleak-android-arm
         
         # Android x86
         echo "Building for Termux (Android x86)"
@@ -136,7 +130,6 @@ jobs:
         name: dnsleak-android-all-architectures
         path: |
           dnsleak-android-arm64
-          dnsleak-android-arm
           dnsleak-android-x86
           dnsleak-android-x86_64
 
@@ -223,7 +216,6 @@ jobs:
           | macOS | x64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-macos-x64"><img src="https://img.shields.io/badge/macOS-x64-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS x64"></a> |
           | macOS | ARM64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-macos-arm64"><img src="https://img.shields.io/badge/macOS-ARM64-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS ARM64"></a> |
           | Android | ARM64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-android-arm64"><img src="https://img.shields.io/badge/Android-ARM64-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android ARM64"></a> |
-          | Android | ARMv7a | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-android-arm"><img src="https://img.shields.io/badge/Android-ARMv7a-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android ARMv7a"></a> |
           | Android | x86 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-android-x86"><img src="https://img.shields.io/badge/Android-x86-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android x86"></a> |
           | Android | x86_64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ env.TAG_NAME }}/dnsleak-android-x86_64"><img src="https://img.shields.io/badge/Android-x86__64-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android x86_64"></a> |
 

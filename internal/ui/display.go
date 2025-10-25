@@ -36,16 +36,16 @@ func (d *Display) PrintTitle(title string) {
 }
 
 // PrintIPSection prints the IP section with formatting
-func (d *Display) PrintIPSection(blocks []model.Block) {
+func (d *Display) PrintIPSection(networkInfos []model.NetworkInfo) {
 	d.titleColor.Println("Your IP:")
-	for _, block := range blocks {
-		if block.Type == "ip" {
-			if block.ASN != "" {
-				d.ipColor.Printf("%s [%s, %s]\n", block.IP, block.CountryName, block.ASN)
-			} else if block.CountryName != "" {
-				d.ipColor.Printf("%s [%s]\n", block.IP, block.CountryName)
+	for _, networkInfo := range networkInfos {
+		if networkInfo.Type == "ip" {
+			if networkInfo.ASN != "" {
+				d.ipColor.Printf("%s [%s, %s]\n", networkInfo.IP, networkInfo.CountryName, networkInfo.ASN)
+			} else if networkInfo.CountryName != "" {
+				d.ipColor.Printf("%s [%s]\n", networkInfo.IP, networkInfo.CountryName)
 			} else {
-				d.ipColor.Printf("%s\n", block.IP)
+				d.ipColor.Printf("%s\n", networkInfo.IP)
 			}
 		}
 	}
@@ -53,10 +53,10 @@ func (d *Display) PrintIPSection(blocks []model.Block) {
 }
 
 // PrintDNSSection prints the DNS section with formatting
-func (d *Display) PrintDNSSection(blocks []model.Block) {
+func (d *Display) PrintDNSSection(networkInfos []model.NetworkInfo) {
 	dnsCount := 0
-	for _, block := range blocks {
-		if block.Type == "dns" {
+	for _, networkInfo := range networkInfos {
+		if networkInfo.Type == "dns" {
 			dnsCount++
 		}
 	}
@@ -70,14 +70,14 @@ func (d *Display) PrintDNSSection(blocks []model.Block) {
 			d.titleColor.Printf("You use %d DNS servers:\n", dnsCount)
 		}
 
-		for _, block := range blocks {
-			if block.Type == "dns" {
-				if block.ASN != "" {
-					d.dnsColor.Printf("%s [%s, %s]\n", block.IP, block.CountryName, block.ASN)
-				} else if block.CountryName != "" {
-					d.dnsColor.Printf("%s [%s]\n", block.IP, block.CountryName)
+		for _, networkInfo := range networkInfos {
+			if networkInfo.Type == "dns" {
+				if networkInfo.ASN != "" {
+					d.dnsColor.Printf("%s [%s, %s]\n", networkInfo.IP, networkInfo.CountryName, networkInfo.ASN)
+				} else if networkInfo.CountryName != "" {
+					d.dnsColor.Printf("%s [%s]\n", networkInfo.IP, networkInfo.CountryName)
 				} else {
-					d.dnsColor.Printf("%s\n", block.IP)
+					d.dnsColor.Printf("%s\n", networkInfo.IP)
 				}
 			}
 		}
@@ -86,16 +86,16 @@ func (d *Display) PrintDNSSection(blocks []model.Block) {
 }
 
 // PrintConclusionSection prints the conclusion section
-func (d *Display) PrintConclusionSection(blocks []model.Block) {
+func (d *Display) PrintConclusionSection(networkInfos []model.NetworkInfo) {
 	d.titleColor.Println("Conclusion:")
-	for _, block := range blocks {
-		if block.Type == "conclusion" {
-			if block.IP != "" {
+	for _, networkInfo := range networkInfos {
+		if networkInfo.Type == "conclusion" {
+			if networkInfo.IP != "" {
 				// Check if DNS is leaking
-				if block.IP == "DNS may be leaking." {
-					d.warningColor.Println(block.IP)
+				if networkInfo.IP == "DNS may be leaking." {
+					d.warningColor.Println(networkInfo.IP)
 				} else {
-					d.successColor.Println(block.IP)
+					d.successColor.Println(networkInfo.IP)
 				}
 			}
 		}

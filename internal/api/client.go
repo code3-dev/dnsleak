@@ -63,20 +63,20 @@ func (c *Client) PerformFakePings(testID string) {
 }
 
 // GetResults retrieves test results from the API
-func (c *Client) GetResults(testID string) ([]model.Block, error) {
+func (c *Client) GetResults(testID string) ([]model.NetworkInfo, error) {
 	url := fmt.Sprintf("https://%s/dnsleak/test/%s?json", c.apiDomain, testID)
 	data, err := c.getContent(url)
 	if err != nil {
 		return nil, err
 	}
 
-	var blocks []model.Block
-	err = json.Unmarshal(data, &blocks)
+	var networkInfos []model.NetworkInfo
+	err = json.Unmarshal(data, &networkInfos)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %v", err)
 	}
 
-	return blocks, nil
+	return networkInfos, nil
 }
 
 // getContent fetches content from a URL

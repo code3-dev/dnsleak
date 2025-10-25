@@ -266,18 +266,8 @@ jobs:
         prerelease: false
 
     - name: Upload Release Assets
-      run: |
-        # Upload all assets in the release-assets directory
-        cd release-assets
-        for file in *; do
-          if [ -f "$file" ]; then
-            echo "Uploading $file"
-            curl \
-              -X POST \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Content-Type: application/octet-stream" \
-              --data-binary @"$file" \
-              "${{ steps.create_release.outputs.upload_url }}?name=$(basename "$file")"
-          fi
-        done
-        cd ..
+      uses: softprops/action-gh-release@v1
+      with:
+        files: release-assets/*
+        tag_name: ${{ env.TAG_NAME }}
+        token: ${{ secrets.GITHUB_TOKEN }}

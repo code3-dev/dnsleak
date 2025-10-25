@@ -246,6 +246,7 @@ jobs:
           2. Perform fake DNS lookups
           3. Analyze the results
           4. Display your IP, DNS servers, and leak status
+          5. Prompt for retry (r) or quit (q) after completion or error
 
           ### 📱 Android/Termux Usage
 
@@ -257,6 +258,28 @@ jobs:
           pkg install golang
           go install github.com/code3-dev/dnsleak@latest
           ~/go/bin/dnsleak
+          ```
+
+          **🔧 SSL Certificate Fix for Termux:**
+
+          If you encounter TLS certificate verification errors on Termux, try one of these solutions:
+
+          **Solution 1: Update certificates**
+          ```bash
+          pkg update && pkg upgrade
+          pkg install ca-certificates openssl-tool
+          export SSL_CERT_FILE=$PREFIX/etc/tls/cert.pem
+          ./dnsleak-android-arm64
+          ```
+
+          **Solution 2: Set certificate file directly**
+          ```bash
+          SSL_CERT_FILE=$PREFIX/etc/tls/cert.pem ./dnsleak-android-arm64
+          ```
+
+          **Solution 3: Bypass certificate verification (less secure)**
+          ```bash
+          DNSLEAK_INSECURE=true ./dnsleak-android-arm64
           ```
 
           ### 📁 File Integrity

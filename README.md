@@ -99,14 +99,24 @@ Simply run the executable based on your operating system:
 
 **For Android/Termux users experiencing certificate errors:**
 
-If you encounter TLS certificate verification errors on Termux, you can bypass certificate verification by setting an environment variable:
+If you encounter TLS certificate verification errors on Termux, try one of these solutions:
 
+**Solution 1: Update certificates**
 ```bash
-# Linux/macOS/Android(Termux)
-DNSLEAK_INSECURE=true ./dnsleak
+pkg update && pkg upgrade
+pkg install ca-certificates openssl-tool
+export SSL_CERT_FILE=$PREFIX/etc/tls/cert.pem
+./dnsleak-android-arm64
+```
 
-# Windows (PowerShell)
-$env:DNSLEAK_INSECURE="true"; .\dnsleak.exe
+**Solution 2: Set certificate file directly**
+```bash
+SSL_CERT_FILE=$PREFIX/etc/tls/cert.pem ./dnsleak-android-arm64
+```
+
+**Solution 3: Bypass certificate verification (less secure)**
+```bash
+DNSLEAK_INSECURE=true ./dnsleak-android-arm64
 ```
 
 **Note:** You can customize the executable name during the build process by using the `-o` flag with `go build` (e.g., `go build -o my-dns-test.exe .`).

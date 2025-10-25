@@ -57,7 +57,7 @@ go build -o your-custom-name.exe .
 - Windows (x86, x64)
 - macOS (x64, ARM64)
 - Linux (x86, x64)
-- Android (Termux - ARMv8a, x86, x86_64)
+- Android (Termux - ARMv7a, ARMv8a, x86, x86_64)
 
 ## GitHub Actions
 
@@ -81,6 +81,7 @@ The GitHub Actions workflow builds the following binaries:
 
 **Android/Termux Architectures:**
 - `dnsleak-android-arm64` (ARMv8a 64-bit)
+- `dnsleak-android-arm` (ARMv7a 32-bit)
 - `dnsleak-android-x86` (x86 32-bit)
 - `dnsleak-android-x86_64` (x86_64 64-bit)
 

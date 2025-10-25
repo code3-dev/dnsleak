@@ -1,0 +1,52 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Build artifacts
+*.out
+*.app
+build/
+dist/
+release-*/
+
+# Go workspace files
+go.work
+
+# Test binary files (used by coverage tools)
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+
+# Configuration files
+.env
+*.env*
+
+# Additional files that should not be tracked
+go.sum
+
+# Release script
+release.sh

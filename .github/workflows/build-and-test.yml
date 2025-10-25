@@ -1,0 +1,261 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        go-version: [1.25.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ matrix.go-version }}
+
+    - name: Print Go version
+      run: go version
+
+    - name: Download dependencies
+      run: go mod download
+
+    - name: Verify dependencies
+      run: go mod verify
+
+    - name: Run tests (if any)
+      run: go test -v ./...
+
+  build:
+    name: Build for ${{ matrix.target.os }}/${{ matrix.target.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          # Linux
+          - { os: linux, arch: amd64, name: linux-x64, binary: dnsleak-linux-x64 }
+          - { os: linux, arch: "386", name: linux-x86, binary: dnsleak-linux-x86 }
+          # Windows
+          - { os: windows, arch: amd64, name: windows-x64, binary: dnsleak-windows-x64.exe }
+          - { os: windows, arch: "386", name: windows-x86, binary: dnsleak-windows-x86.exe }
+          # macOS
+          - { os: darwin, arch: amd64, name: macos-x64, binary: dnsleak-macos-x64 }
+          - { os: darwin, arch: arm64, name: macos-arm64, binary: dnsleak-macos-arm64 }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.25.x
+
+    - name: Set up environment
+      run: |
+        echo "GOOS=${{ matrix.target.os }}" >> $GITHUB_ENV
+        echo "GOARCH=${{ matrix.target.arch }}" >> $GITHUB_ENV
+
+    - name: Build binary
+      run: |
+        # Build the application with the correct name
+        echo "Building for ${{ matrix.target.name }} (${{ matrix.target.os }}/${{ matrix.target.arch }})"
+        CGO_ENABLED=0 GOOS=${{ matrix.target.os }} GOARCH=${{ matrix.target.arch }} go build -o ${{ matrix.target.binary }} .
+        
+        # Show file information
+        ls -la ${{ matrix.target.binary }}
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dnsleak-${{ matrix.target.name }}
+        path: ${{ matrix.target.binary }}
+
+  build-android:
+    name: Build for Android (Termux)
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.25.x
+
+    - name: Build for Termux (All Android Architectures)
+      run: |
+        # Android ARM64 (ARMv8a)
+        echo "Building for Termux (Android ARM64/ARMv8a)"
+        CGO_ENABLED=0 GOOS=android GOARCH=arm64 go build -o dnsleak-android-arm64 .
+        ls -la dnsleak-android-arm64
+        
+        # Android ARM (ARMv7a)
+        echo "Building for Termux (Android ARM/ARMv7a)"
+        CGO_ENABLED=0 GOOS=android GOARCH=arm go build -o dnsleak-android-arm .
+        ls -la dnsleak-android-arm
+        
+        # Android x86
+        echo "Building for Termux (Android x86)"
+        CGO_ENABLED=0 GOOS=android GOARCH=386 go build -o dnsleak-android-x86 .
+        ls -la dnsleak-android-x86
+        
+        # Android x86_64
+        echo "Building for Termux (Android x86_64)"
+        CGO_ENABLED=0 GOOS=android GOARCH=amd64 go build -o dnsleak-android-x86_64 .
+        ls -la dnsleak-android-x86_64
+
+    - name: Upload Android artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dnsleak-android-all-architectures
+        path: |
+          dnsleak-android-arm64
+          dnsleak-android-arm
+          dnsleak-android-x86
+          dnsleak-android-x86_64
+
+  release:
+    name: Create Release
+    needs: [build, build-android]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+
+    - name: Prepare release assets
+      run: |
+        # Create a directory for all release assets
+        mkdir -p release-assets
+        
+        # Move all binaries to the release-assets directory
+        find . -name "dnsleak-*" -type f -not -path "./release-assets/*" -not -path "./.git/*" | while read file; do
+          mv "$file" release-assets/
+        done
+        
+        # List the release assets
+        echo "Release assets prepared:"
+        ls -la release-assets/
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: DNS Leak Test ${{ github.ref }}
+        body: |
+          ## 🚀 DNS Leak Test Release
+
+          A Go application to test for DNS leaks. This tool checks if your DNS queries are being routed through your ISP or if they're being securely routed through your VPN or DNS service.
+
+          ### ✨ Features
+          - 🔍 Tests for DNS leaks
+          - 🎨 Colorful terminal interface
+          - 🖥️ Cross-platform support (Windows, macOS, Linux, Android/Termux)
+          - 🏗️ Clean, modular architecture
+
+          ### 📋 Changes in this Release
+          - Cross-platform support with GitHub Actions builds
+          - Added colorful terminal interface using github.com/fatih/color
+          - Implemented API client for bash.ws
+          - Created modular architecture with internal packages
+
+          ### 💻 Installation
+
+          #### From Binary (Recommended)
+          Download the appropriate binary for your platform from the table below and run it directly.
+
+          #### From Source
+          ```bash
+          git clone https://github.com/code3-dev/dnsleak
+          cd dnsleak
+          go build .
+          ./dnsleak  # or dnsleak.exe on Windows
+          ```
+
+          ### ⬇️ Download
+
+          | Platform | Architecture | Download |
+          |----------|-------------|----------|
+          | Windows | x64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-windows-x64.exe"><img src="https://img.shields.io/badge/Windows-x64-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows x64"></a> |
+          | Windows | x86 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-windows-x86.exe"><img src="https://img.shields.io/badge/Windows-x86-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows x86"></a> |
+          | Linux | x64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-linux-x64"><img src="https://img.shields.io/badge/Linux-x64-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux x64"></a> |
+          | Linux | x86 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-linux-x86"><img src="https://img.shields.io/badge/Linux-x86-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux x86"></a> |
+          | macOS | x64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-macos-x64"><img src="https://img.shields.io/badge/macOS-x64-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS x64"></a> |
+          | macOS | ARM64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-macos-arm64"><img src="https://img.shields.io/badge/macOS-ARM64-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS ARM64"></a> |
+          | Android | ARM64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-android-arm64"><img src="https://img.shields.io/badge/Android-ARM64-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android ARM64"></a> |
+          | Android | ARMv7a | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-android-arm"><img src="https://img.shields.io/badge/Android-ARMv7a-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android ARMv7a"></a> |
+          | Android | x86 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-android-x86"><img src="https://img.shields.io/badge/Android-x86-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android x86"></a> |
+          | Android | x86_64 | <a href="https://github.com/code3-dev/dnsleak/releases/download/${{ github.ref_name }}/dnsleak-android-x86_64"><img src="https://img.shields.io/badge/Android-x86__64-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android x86_64"></a> |
+
+          ### 🛠️ Usage
+
+          Simply download the appropriate binary for your platform and run it:
+
+          ```bash
+          # Linux/macOS/Android(Termux)
+          chmod +x dnsleak-*
+          ./dnsleak-*
+
+          # Windows (PowerShell/CMD)
+          .\dnsleak-*.exe
+          ```
+
+          The tool will:
+          1. Obtain a test ID from bash.ws
+          2. Perform fake DNS lookups
+          3. Analyze the results
+          4. Display your IP, DNS servers, and leak status
+
+          ### 📱 Android/Termux Usage
+
+          For Android devices, you'll need to install [Termux](https://termux.dev/) first. Then you can either:
+          1. Download the appropriate Android binary from the table above
+          2. Or install directly with Go:
+
+          ```bash
+          pkg install golang
+          go install github.com/code3-dev/dnsleak@latest
+          ~/go/bin/dnsleak
+          ```
+
+          ### 📁 File Integrity
+
+          All binaries are built using GitHub Actions with CGO disabled for maximum portability and security. You can verify the SHA256 checksums of downloaded files if needed.
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Assets
+      run: |
+        # Upload all assets in the release-assets directory
+        cd release-assets
+        for file in *; do
+          if [ -f "$file" ]; then
+            echo "Uploading $file"
+            curl \
+              -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Content-Type: application/octet-stream" \
+              --data-binary @"$file" \
+              "${{ steps.create_release.outputs.upload_url }}?name=$(basename "$file")"
+          fi
+        done

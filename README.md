@@ -18,7 +18,7 @@ Visit the [Releases page](https://github.com/code3-dev/dnsleak/releases) and dow
 ### From Source
 
 ```bash
-git clone https://github.com/code3-dev/dnsleak
+git clone https://github.com/code3-dev/dnsleak.git
 cd dnsleak
 ```
 

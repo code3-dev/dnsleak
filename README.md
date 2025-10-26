@@ -52,6 +52,9 @@ For Windows users, you can use the provided batch file for easier setup and exec
 After setup, you can run `dnsleak` directly from the command line.
 
 ```bash
+# Run setup
+.\windows_setup.bat
+
 # Windows (PowerShell/CMD)
 dnsleak
 ```

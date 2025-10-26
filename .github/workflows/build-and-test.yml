@@ -207,7 +207,7 @@ jobs:
 
           #### From Source
           ```bash
-          git clone https://github.com/code3-dev/dnsleak
+          git clone https://github.com/code3-dev/dnsleak.git
           cd dnsleak
           go build .
           ./dnsleak  # or dnsleak.exe on Windows
@@ -250,15 +250,10 @@ jobs:
 
           ### 📱 Android/Termux Usage
 
-          For Android devices, you'll need to install [Termux](https://termux.dev/) first. Then you can either:
-          1. Download the appropriate Android binary from the table above
-          2. Or install directly with Go:
-
-          ```bash
-          pkg install golang
-          go install github.com/code3-dev/dnsleak@latest
-          ~/go/bin/dnsleak
-          ```
+          For Android devices, you'll need to install [Termux](https://termux.dev/).
+          
+          ## Setup script to easily install DNSLeak in Termux on Android.
+          https://github.com/code3-dev/dnsleak-termux
 
           **🔧 SSL Certificate Fix for Termux:**
 

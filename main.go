@@ -6,6 +6,7 @@ import (
 	"os"
 	"pira/dnsleak/internal/api"
 	"pira/dnsleak/internal/ui"
+	"strings"
 )
 
 func main() {
@@ -17,26 +18,28 @@ func main() {
 			display.PrintError(err)
 			
 			// Prompt user for retry or quit after error
-			fmt.Print("\nError occurred. Press 'r' to retry or 'q' to quit: ")
+			fmt.Print("\nPress 'q' to quit or any other key to retry: ")
 			reader := bufio.NewReader(os.Stdin)
 			input, _ := reader.ReadString('\n')
+			input = strings.TrimSpace(input) // Trim whitespace and newlines
 			
-			if input[0] == 'q' || input[0] == 'Q' {
+			if len(input) > 0 && (input[0] == 'q' || input[0] == 'Q') {
 				break
 			}
-			// If 'r' or anything else, continue the loop to retry
+			// If any other key, continue the loop to retry
 			continue
 		}
 		
 		// Prompt user for retry or quit after successful completion
-		fmt.Print("\nTask completed. Press 'r' to retry or 'q' to quit: ")
+		fmt.Print("\nPress 'q' to quit or any other key to retry: ")
 		reader := bufio.NewReader(os.Stdin)
 		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input) // Trim whitespace and newlines
 		
-		if input[0] == 'q' || input[0] == 'Q' {
+		if len(input) > 0 && (input[0] == 'q' || input[0] == 'Q') {
 			break
 		}
-		// If 'r' or anything else, continue the loop to retry
+		// If any other key, continue the loop to retry
 	}
 }
 

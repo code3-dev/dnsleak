@@ -7,6 +7,7 @@ A Go application to test for DNS leaks. This tool checks if your DNS queries are
 - 🔍 Tests for DNS leaks
 - 🎨 Colorful terminal interface
 - 🖥️ Cross-platform support (Windows, macOS, Linux, Android/Termux)
+- 🔄 Retry functionality - Press 'q' to quit or any other key to retry after each test
 - 🏗️ Clean, modular architecture
 
 ## Installation
@@ -18,7 +19,7 @@ Visit the [Releases page](https://github.com/code3-dev/dnsleak/releases) and dow
 ### From Source
 
 ```bash
-git clone https://github.com/code3-dev/dnsleak.git
+git clone https://github.com/code3-dev/dnsleak
 cd dnsleak
 ```
 
@@ -38,18 +39,95 @@ go build -o your-custom-name .
 go build -o your-custom-name.exe .
 ```
 
+### Windows Setup
+
+For Windows users, you can use the provided batch file for easier setup and execution:
+
+1. Run `setup\windows_setup.bat` to automatically:
+   - Check for Go installation
+   - Set up Go environment variables
+   - Build the application
+   - Create a desktop shortcut
+
+After setup, you can run `dnsleak.exe` directly from the command line or by double-clicking the executable on your Desktop.
+
 **Run the application:**
 
 ```bash
-# Linux/macOS/Android(Termux)
-./dnsleak
-# or if you used a custom name:
-./your-custom-name
-
 # Windows (PowerShell/CMD)
 .\dnsleak.exe
 # or if you used a custom name:
 .\your-custom-name.exe
+```
+
+### Linux Setup
+
+For Linux users, you can use the provided shell script for easier setup and execution:
+
+1. Run `setup/linux_setup.sh` to automatically:
+   - Check for Go installation
+   - Set up Go environment variables
+   - Build the application
+   - Create a symlink for easy access
+
+After setup, you can run `dnsleak` directly from the command line.
+
+```bash
+# Make script executable
+chmod +x setup/linux_setup.sh
+
+# Run setup
+./setup/linux_setup.sh
+
+# Run application (after adding to PATH or creating symlink)
+dnsleak
+```
+
+### macOS Setup
+
+For macOS users, you can use the provided shell script for easier setup and execution:
+
+1. Run `setup/macos_setup.sh` to automatically:
+   - Check for Go installation
+   - Set up Go environment variables
+   - Build the application
+   - Create a symlink for easy access
+
+After setup, you can run `dnsleak` directly from the command line.
+
+```bash
+# Make script executable
+chmod +x setup/macos_setup.sh
+
+# Run setup
+./setup/macos_setup.sh
+
+# Run application (after adding to PATH or creating symlink)
+dnsleak
+```
+
+### Android/Termux Setup
+
+For Android users using Termux, you can use the provided shell script for automatic installation:
+
+1. Run `setup/android_setup.sh` directly in Termux to automatically:
+   - Install required packages (git, golang, etc.)
+   - Set up Go environment variables
+   - Clone or update the dnsleak repository
+   - Build the application
+   - Create a symlink for easy access
+
+After setup, you can run `dnsleak` directly from the Termux command line.
+
+```bash
+# Make script executable
+chmod +x setup/android_setup.sh
+
+# Run setup (in Termux)
+./setup/android_setup.sh
+
+# Run application (after setup)
+dnsleak
 ```
 
 ## Supported Platforms
@@ -126,7 +204,7 @@ The tool will:
 2. Perform fake DNS lookups
 3. Analyze the results
 4. Display your IP, DNS servers, and leak status
-5. Prompt for retry (r) or quit (q) after completion or error
+5. Prompt to quit (q) or retry (any other key) after completion or error
 
 ## Architecture
 
@@ -136,9 +214,6 @@ internal/
 ├── model/        # Data structures
 └── ui/           # Terminal user interface
 ```
-
-## Setup script to easily install DNSLeak in Termux on Android.
-https://github.com/code3-dev/dnsleak-termux
 
 ## Author
 

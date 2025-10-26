@@ -246,7 +246,7 @@ jobs:
           2. Perform fake DNS lookups
           3. Analyze the results
           4. Display your IP, DNS servers, and leak status
-          5. Prompt for retry (r) or quit (q) after completion or error
+          5. Prompt to quit (q) or retry (any other key) after completion or error
 
           ### 📱 Android/Termux Usage
 

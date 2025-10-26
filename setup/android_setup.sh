@@ -8,22 +8,7 @@ pkg update -y
 pkg install -y git golang which ca-certificates openssl-tool
 
 # ----------------------------------------
-# 2) Persistent Go environment
-# ----------------------------------------
-# Avoid duplicate lines
-grep -qxF 'export GOPATH=$HOME/go' ~/.profile || echo 'export GOPATH=$HOME/go' >> ~/.profile
-grep -qxF 'export GOBIN=$GOPATH/bin' ~/.profile || echo 'export GOBIN=$GOPATH/bin' >> ~/.profile
-if ! grep -q 'export PATH=.*\$GOBIN' ~/.profile; then
-  echo 'export PATH=$PATH:$GOBIN' >> ~/.profile
-fi
-
-# Apply to current shell
-export GOPATH="$HOME/go"
-export GOBIN="$GOPATH/bin"
-mkdir -p "$GOBIN"
-
-# ----------------------------------------
-# 3) Clone or update dnsleak repo
+# 2) Clone or update dnsleak repo
 # ----------------------------------------
 WORKDIR="$HOME/src"
 mkdir -p "$WORKDIR"
@@ -39,12 +24,26 @@ else
 fi
 
 # ----------------------------------------
-# 4) Ensure Go modules are tidy & dependencies fetched
+# 3) Ensure Go modules are tidy & dependencies fetched
 # ----------------------------------------
 go mod tidy
 
 # ----------------------------------------
-# 5) Build into GOBIN
+# 4) Try to build without cgo first
+# ----------------------------------------
+if ! go build -o "$GOBIN/dnsleak" .; then
+  echo "Build failed, installing additional build tools for cgo compatibility..."
+  # Install additional build tools required for cgo (only if needed)
+  pkg install -y clang make pkg-config autoconf automake libtool || true
+  
+  # Ensure Go environment and cgo settings for Termux/aarch64
+  export CC=clang
+  export CXX=clang++
+  export CGO_ENABLED=0
+fi
+
+# ----------------------------------------
+# 5) Build into GOBIN (retry if previous attempt failed)
 # ----------------------------------------
 go build -o "$GOBIN/dnsleak" .
 
@@ -72,3 +71,4 @@ echo "dnsleak:"
 dnsleak || true
 
 echo "Done. If a new shell doesn't see the command, run: . ~/.profile or restart Termux."
+echo "You can now run the app by typing: dnsleak"

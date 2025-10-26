@@ -137,6 +137,9 @@ internal/
 └── ui/           # Terminal user interface
 ```
 
+## Setup script to easily install DNSLeak in Termux on Android.
+https://github.com/code3-dev/dnsleak-termux
+
 ## Author
 
 Hossein Pira - [h3dev.pira@gmail.com](mailto:h3dev.pira@gmail.com)

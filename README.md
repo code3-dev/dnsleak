@@ -49,15 +49,11 @@ For Windows users, you can use the provided batch file for easier setup and exec
    - Build the application
    - Create a desktop shortcut
 
-After setup, you can run `dnsleak.exe` directly from the command line or by double-clicking the executable on your Desktop.
-
-**Run the application:**
+After setup, you can run `dnsleak` directly from the command line.
 
 ```bash
 # Windows (PowerShell/CMD)
-.\dnsleak.exe
-# or if you used a custom name:
-.\your-custom-name.exe
+dnsleak
 ```
 
 ### Linux Setup
@@ -168,10 +164,10 @@ The GitHub Actions workflow automatically builds and releases the following bina
 Simply run the executable based on your operating system:
 
 ```bash
-# Linux/macOS/Android(Termux)
-./dnsleak
+# Linux/macOS/Android(Termux)/Windows (after setup)
+dnsleak
 
-# Windows (PowerShell/CMD)
+# Windows (PowerShell/CMD) (without setup or if not in PATH)
 .\dnsleak.exe
 ```
 

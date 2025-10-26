@@ -49,8 +49,8 @@ echo "----------------------------------------"
 echo "3) Building DNSLeak application"
 echo "----------------------------------------"
 
-# Change to the script directory
-cd "$(dirname "$0")"
+# Change to the parent directory (where the Go source files are located)
+cd "$(dirname "$0")/.."
 
 # Tidy modules
 echo "Running go mod tidy..."
@@ -112,4 +112,6 @@ echo "2. Directly: $GOBIN/dnsleak"
 echo ""
 echo "To test now, you can run:"
 echo "  $GOBIN/dnsleak"
+echo "or simply type:"
+echo "  dnsleak"
 echo ""

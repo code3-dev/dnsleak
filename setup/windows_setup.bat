@@ -51,8 +51,8 @@ echo ----------------------------------------
 echo 3) Building DNSLeak application
 echo ----------------------------------------
 
-REM Change to the script directory
-cd /d "%~dp0"
+REM Change to the parent directory (where the Go source files are located)
+cd /d "%~dp0.."
 
 REM Tidy modules
 echo Running go mod tidy...
@@ -118,6 +118,8 @@ echo 2. By double-clicking the dnsleak.exe file on your Desktop
 echo.
 echo To test now, you can run:
 echo   "%GOBIN%\dnsleak.exe"
+echo or simply type:
+echo   dnsleak
 echo.
 
 pause

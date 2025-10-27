@@ -33,6 +33,11 @@ else
   cd dnsleak
 fi
 
+# ----------------------------------------
+# Ensure Go modules are tidy & dependencies fetched
+# ----------------------------------------
+go mod tidy
+
 # build into GOBIN (handles module path mismatch by building locally)
 go build -o "$GOBIN/dnsleak" .
 
